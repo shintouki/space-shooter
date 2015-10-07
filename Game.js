@@ -40,21 +40,53 @@ BasicGame.Game.prototype = {
         this.player_ship = this.add.sprite(400, 500, 'player_ship');
         this.player_ship.anchor.setTo(0.5, 0.5);
         this.physics.enable(this.player_ship, Phaser.Physics.ARCADE);
+        this.player_ship.speed = 250;
+        this.player_ship.body.collideWorldBounds = true;
 
         this.enemy_ship1 = this.add.sprite(400, 200, 'enemy_ship1');
         this.enemy_ship1.anchor.setTo(0.5, 0.5);
         this.physics.enable(this.enemy_ship1, Phaser.Physics.ARCADE);
 
-        this.bullet = this.add.sprite(400, 300, 'bullet');
-        this.bullet.anchor.setTo(0.5, 0.5);
-        this.physics.enable(this.bullet, Phaser.Physics.ARCADE);
-        this.bullet.body.velocity.y = -500;
+        // this.bullet = this.add.sprite(400, 300, 'bullet');
+        // this.bullet.anchor.setTo(0.5, 0.5);
+        // this.physics.enable(this.bullet, Phaser.Physics.ARCADE);
+        // this.bullet.body.velocity.y = -500;
+        this.bullets = [];
 
         this.cursors = this.input.keyboard.createCursorKeys();
     },
 
     update: function () {
-        this.physics.arcade.overlap(this.bullet, this.enemy_ship1, this.enemyHit, null, this);
+        // this.physics.arcade.overlap(this.bullet, this.enemy_ship1, this.enemyHit, null, this);
+
+        for (var i = 0; i < this.bullets.length; i++) {
+            this.physics.arcade.overlap(this.bullets[i], this.enemy_ship1, this.enemyHit, null, this);
+        }
+
+        this.player_ship.body.velocity.x = 0;
+        this.player_ship.body.velocity.y = 0;
+
+        // Move player_ship to location of mouse pointer
+        // Does not move if pointer is within 15 pixels of player_ship
+        if (this.input.activePointer.isDown && this.physics.arcade.distanceToPointer(this.player_ship) > 15) {
+            this.physics.arcade.moveToPointer(this.player_ship, this.player_ship.speed);
+        }
+
+        if (this.input.keyboard.isDown(Phaser.Keyboard.Z) || this.input.activePointer.isDown) {
+            this.fire();
+        }
+
+        if (this.cursors.left.isDown) {
+            this.player_ship.body.velocity.x = -this.player_ship.speed;
+        } else if (this.cursors.right.isDown) {
+            this.player_ship.body.velocity.x = this.player_ship.speed;
+        }
+
+        if (this.cursors.up.isDown) {
+            this.player_ship.body.velocity.y = -this.player_ship.speed;
+        } else if (this.cursors.down.isDown) {
+            this.player_ship.body.velocity.y = this.player_ship.speed;
+        }
     },
 
     render: function () {
@@ -76,6 +108,15 @@ BasicGame.Game.prototype = {
         explosion1.animations.add('explode');
         explosion1.play('explode', 10, false, true);
     },
+
+    fire: function () {
+        var bullet = this.add.sprite(this.player_ship.x, this.player_ship.y - 20, 'bullet');
+        bullet.anchor.setTo(0.5, 0.5);
+        this.physics.enable(bullet, Phaser.Physics.ARCADE);
+        bullet.body.velocity.y = -500;
+        this.bullets.push(bullet);
+    },
+
 
     quitGame: function (pointer) {
 
