@@ -29,30 +29,53 @@ BasicGame.Game.prototype = {
 
     preload: function () {
         this.load.image('starfield', 'assets/starfield.png');
-        // this.load.spritesheet('starship', 'starship.svg', 32, 32);
+        this.load.image('bullet', 'assets/bullet.png');
+        this.load.image('player_ship', 'assets/player_ship.png', 32, 32);
+        this.load.image('enemy_ship1', 'assets/enemy_1.png', 32, 32);
+        this.load.spritesheet('explosion1', 'assets/explosion.png', 32, 32);
     },
 
     create: function () {
-        // this.setupBackground();
-       this.starfield = this.add.tileSprite(0, 0, 800, 600, 'starfield');
+        this.setupBackground();
+        this.player_ship = this.add.sprite(400, 500, 'player_ship');
+        this.player_ship.anchor.setTo(0.5, 0.5);
+        this.physics.enable(this.player_ship, Phaser.Physics.ARCADE);
 
-       // this.starship = this.add.sprite(400, 500, 'starship');
+        this.enemy_ship1 = this.add.sprite(400, 200, 'enemy_ship1');
+        this.enemy_ship1.anchor.setTo(0.5, 0.5);
+        this.physics.enable(this.enemy_ship1, Phaser.Physics.ARCADE);
+
+        this.bullet = this.add.sprite(400, 300, 'bullet');
+        this.bullet.anchor.setTo(0.5, 0.5);
+        this.physics.enable(this.bullet, Phaser.Physics.ARCADE);
+        this.bullet.body.velocity.y = -500;
+
+        this.cursors = this.input.keyboard.createCursorKeys();
     },
 
     update: function () {
-        this.starfield.tilePosition.y += 0.2;
-        //  Honestly, just about anything could go here. It's YOUR game after all. Eat your heart out!
-
+        this.physics.arcade.overlap(this.bullet, this.enemy_ship1, this.enemyHit, null, this);
     },
 
     render: function () {
-
+        // this.game.debug.body(this.player_ship);
+        // this.game.debug.body(this.enemy_ship1);
+        // this.game.debug.body(this.bullet);
     },
 
-    // setupBackground: function () {
-    //     this.starfield = this.add.tileSprite(0, 0, 800, 600, 'starfield');
-    //     this.starfield.autoScroll(0, 12);
-    // },
+    setupBackground: function () {
+        this.starfield = this.add.tileSprite(0, 0, 800, 600, 'starfield');
+        this.starfield.autoScroll(0, 12);
+    },
+
+    enemyHit: function (bullet, enemy_ship) {
+        bullet.kill();
+        enemy_ship.kill();
+        var explosion1 = this.add.sprite(enemy_ship.x, enemy_ship.y, 'explosion1');
+        explosion1.anchor.setTo(0.5, 0.5);
+        explosion1.animations.add('explode');
+        explosion1.play('explode', 10, false, true);
+    },
 
     quitGame: function (pointer) {
 
