@@ -52,8 +52,17 @@ BasicGame.Game.prototype = {
         // this.physics.enable(this.bullet, Phaser.Physics.ARCADE);
         // this.bullet.body.velocity.y = -500;
         this.bullets = [];
+        this.nextShotAt = 0;
+        this.shotDelay = 100;
 
         this.cursors = this.input.keyboard.createCursorKeys();
+
+        this.instructions = this.add.text(400, 500,
+            'Use Arrow Keys or Mouse to Move\n Press Z or Click With Mouse to Fire',
+            {font: '20px monospace', fill: '#fff', align: 'center' }
+        );
+        this.instructions.anchor.setTo(0.5, 0.5);
+        this.instExpire = this.time.now + 10000;
     },
 
     update: function () {
@@ -87,6 +96,10 @@ BasicGame.Game.prototype = {
         } else if (this.cursors.down.isDown) {
             this.player_ship.body.velocity.y = this.player_ship.speed;
         }
+
+        if (this.instructions.exists && this.time.now > this.instExpire) {
+            this.instructions.destroy();
+        }
     },
 
     render: function () {
@@ -110,6 +123,12 @@ BasicGame.Game.prototype = {
     },
 
     fire: function () {
+        if (this.nextShotAt > this.time.now) {
+            return;
+        }
+
+        this.nextShotAt = this.time.now + this.shotDelay;
+
         var bullet = this.add.sprite(this.player_ship.x, this.player_ship.y - 20, 'bullet');
         bullet.anchor.setTo(0.5, 0.5);
         this.physics.enable(bullet, Phaser.Physics.ARCADE);
