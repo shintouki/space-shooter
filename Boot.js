@@ -1,4 +1,56 @@
-var BasicGame = {};
+var BasicGame = {
+    // Damage
+    BASIC_BULLET_DAMAGE: 1,
+    MISSILE_DAMAGE: 5,
+    FIREBALL_DAMAGE: 5,
+    CRASH_DAMAGE: 5,
+
+    // Player weapon shot delay
+    BULLET_DELAY: Phaser.Timer.SECOND * 0.2,
+    MISSILE_DELAY: Phaser.Timer.SECOND * 0.5,
+    FIREBALL_DELAY: Phaser.Timer.SECOND * 2,
+
+    // Enemy shot delay
+    BASIC_ENEMY_SHOT_DELAY: Phaser.Timer.SECOND * 4,
+    SCARY_ENEMY_SHOT_DELAY: Phaser.Timer.SECOND * 2,
+
+    // Enemy health
+    BASIC_ENEMY_HEALTH: 2,
+    SCARY_ENEMY_HEALTH: 5,
+
+    ENEMY_BULLET_VELOCITY: 150,
+
+    // Enemy spawn delay
+    SPAWN_BASIC_DELAY: Phaser.Timer.SECOND,
+    SPAWN_SCARY_DELAY: Phaser.Timer.SECOND * 4,
+
+    // Speed
+    PLAYER_SHIP_SPEED: 250,
+    SCARY_MIN_SPEED: 25,
+    SCARY_MAX_SPEED: 70,
+
+    // Reward
+    BASIC_ENEMY_REWARD: 1000,
+    SCARY_ENEMY_REWARD: 3000,
+    BOSS_REWARD: 50000,
+    POWER_UP_REWARD: 1000,
+
+    // Power up drop rate
+    BASIC_ENEMY_MISSILE_DROP_RATE: 0.2,
+    SCARY_ENEMY_MISSILE_DROP_RATE: 0.4,
+    BASIC_ENEMY_FIREBALL_DROP_RATE: 0.2,
+    SCARY_ENEMY_FIREBALL_DROP_RATE: 0.4,
+
+
+    // Lives
+    EXTRA_LIVES: 3,
+
+    // Invulnerable time
+    INVULNERABLE_TIME: Phaser.Timer.SECOND * 3,
+
+    // Text timers
+    RESTART_MESSAGE_DELAY: Phaser.Timer.SECOND * 2 
+};
 
 BasicGame.Boot = function (game) {
 
