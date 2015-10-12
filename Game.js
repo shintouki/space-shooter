@@ -132,6 +132,16 @@ BasicGame.Game.prototype = {
         }
     },
 
+    updateFireballPosition: function () {
+        if (this.fireballOn) {
+            this.fireball.reset(this.player_ship.x, this.player_ship.y - 50);
+        }
+        if (this.fireballOn && this.time.now > this.fireballExpire) {
+            this.fireball.kill();
+            fireballOn = false;
+        }
+    },
+
     processPlayerInput: function () {
         this.player_ship.body.velocity.x = 0;
         this.player_ship.body.velocity.y = 0;
@@ -203,6 +213,7 @@ BasicGame.Game.prototype = {
         this.checkCollisions();
         this.spawnEnemies();
         this.enemyFire();
+        this.updateFireballPosition();
         this.processPlayerInput();
         this.processDelayedEffects();
     },
@@ -215,10 +226,12 @@ BasicGame.Game.prototype = {
         // this.debugGroup(this.basicEnemyPool);
         // this.debugGroup(this.scaryEnemyPool);
         // this.debugGroup(this.bulletPool);
+        // this.debugGroup(this.laserPool);
         // this.debugGroup(this.missilePool);
         // this.debugGroup(this.missileMirrorPool);
         // // this.debugGroup(this.fireballPool)
         // this.debugGroup(this.enemyBulletPool);
+        // this.debugGroup(this.laserPowerUpPool);
         // this.debugGroup(this.missilePowerUpPool);
         // this.debugGroup(this.fireballPowerUpPool);
     },
@@ -244,6 +257,7 @@ BasicGame.Game.prototype = {
         this.laserActivated = false;
         this.missileActivated = false;
         this.fireballActivated = false;
+        this.fireballOn = false;
     },
 
     setupEnemies: function() {
@@ -558,20 +572,23 @@ BasicGame.Game.prototype = {
         }
 
         this.nextFireballShotAt = this.time.now + this.FireballShotDelay;
+        this.fireballOn = true;
 
-
-        var fireball = this.fireballPool.getFirstExists(false);
-        fireball.scale.set(2.25, 3);
-        fireball.angle = 90;
-        fireball.reset(this.player_ship.x, this.player_ship.y - 50);
+        this.fireball = this.fireballPool.getFirstExists(false);
+        this.fireball.scale.set(2.25, 3);
+        this.fireball.angle = 90;
+        this.fireball.reset(this.player_ship.x, this.player_ship.y - 50);
+        // this.updateFireballPosition(fireball);
         // fireball.body.velocity.y = -100;
-        fireball.body.velocity.y = -10;
-        fireball.body.setSize(60, 50, -5, -20);
+        // fireball.body.velocity.y = -10;
+        this.fireball.body.setSize(60, 50, -5, -20);
         // this.player_ship.body.setSize(10, 10, 0, -5);
 
-        this.game.time.events.add(1000, function() {
-            fireball.kill();
-        }, this);
+        this.fireballExpire = this.time.now + 1000;
+        // this.game.time.events.add(1000, function() {
+        //     this.fireball.kill();
+        //     fireballOn = false;
+        // }, this);
     },
 
     enemyFire: function () {
