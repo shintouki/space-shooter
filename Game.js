@@ -260,7 +260,7 @@ BasicGame.Game.prototype = {
         this.nextScaryEnemyDelay = BasicGame.SPAWN_SCARY_DELAY;
     },
 
-    
+
 
     setupBullets: function() {
         this.enemyBulletPool = this.add.group();
@@ -439,14 +439,13 @@ BasicGame.Game.prototype = {
     },
 
     explode: function (sprite) {
-        if (this.explosionPool.countDead() === 0) {
-            return;
+        if (this.explosionPool.countDead() > 0) {
+            var explosion = this.explosionPool.getFirstExists(false);
+            explosion.reset(sprite.x, sprite.y);
+            explosion.play('boom', 10, false, true);
+            explosion.body.velocity.x = sprite.body.velocity.x;
+            explosion.body.velocity.y = sprite.body.velocity.y;
         }
-        var explosion = this.explosionPool.getFirstExists(false);
-        explosion.reset(sprite.x, sprite.y);
-        explosion.play('boom', 10, false, true);
-        explosion.body.velocity.x = sprite.body.velocity.x;
-        explosion.body.velocity.y = sprite.body.velocity.y;
     },
 
     fireBullet: function () {
@@ -539,7 +538,7 @@ BasicGame.Game.prototype = {
         }
 
         // Missile power up
-        if (this.rnd.frac() < enemy_ship.missileDropRate) {
+        if (this.rnd.frac() < enemy_ship.missileDropRate && this.missilePowerUpPool.countDead() > 0) {
             var missilePowerUp = this.missilePowerUpPool.getFirstExists(false);
             missilePowerUp.scale.set(0.75, 0.75);
             missilePowerUp.reset(enemy_ship.x, enemy_ship.y);
@@ -547,7 +546,7 @@ BasicGame.Game.prototype = {
         }
 
         // Fireball power up
-        if (this.rnd.frac() < enemy_ship.fireballDropRate) {
+        if (this.rnd.frac() < enemy_ship.fireballDropRate && this.fireballPowerUpPool.countDead() > 0) {
             var fireballPowerUp = this.fireballPowerUpPool.getFirstExists(false);
             fireballPowerUp.scale.set(0.75, 0.75);
             fireballPowerUp.reset(enemy_ship.x, enemy_ship.y);
