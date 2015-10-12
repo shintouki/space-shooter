@@ -613,7 +613,14 @@ BasicGame.Game.prototype = {
         if (this.score >= 500000) {
             this.basicEnemyPool.destroy();
             this.scaryEnemyPool.destroy();
+            this.bulletPool.desetroy();
             this.enemyBulletPool.destroy();
+            this.laserPool.destroy();
+            this.missilePool.destroy();
+            this.fireballPool.destroy();
+            this.laserPowerUpPool.destroy();
+            this.missilePowerUpPool.destroy();
+            this.fireballPowerUpPool.destroy();
             this.displayEnd(true);
         }
     },
@@ -729,7 +736,7 @@ BasicGame.Game.prototype = {
         this.missilePool.destroy();
         this.fireballPool.destroy();
         this.explosionPool.destroy();
-        this.laserPowerUpPool.destory();
+        this.laserPowerUpPool.destroy();
         this.missilePowerUpPool.destroy();
         this.fireballPowerUpPool.destroy();
         this.instructions.destroy();
