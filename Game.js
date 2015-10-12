@@ -613,7 +613,7 @@ BasicGame.Game.prototype = {
         if (this.score >= 500000) {
             this.basicEnemyPool.destroy();
             this.scaryEnemyPool.destroy();
-            this.bulletPool.desetroy();
+            this.bulletPool.destroy();
             this.enemyBulletPool.destroy();
             this.laserPool.destroy();
             this.missilePool.destroy();
