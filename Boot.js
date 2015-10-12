@@ -7,7 +7,7 @@ var BasicGame = {
 
     // Player weapon shot delay
     BULLET_DELAY: Phaser.Timer.SECOND * 0.2,
-    MISSILE_DELAY: Phaser.Timer.SECOND * 0.75,
+    MISSILE_DELAY: Phaser.Timer.SECOND * 1,
     FIREBALL_DELAY: Phaser.Timer.SECOND * 2,
 
     // Enemy shot delay

@@ -59,9 +59,10 @@ BasicGame.Game.prototype = {
 
     create: function () {
         this.setupBackground();
-        this.setupPlayerShip();
+        
         this.setupMissiles();
         this.setupFireballs();
+        this.setupPlayerShip();
         this.setupEnemies();
         this.setupBullets();
         
@@ -575,10 +576,14 @@ BasicGame.Game.prototype = {
         }
 
         var missileMessage = "Missile";
-        this.missileText = this.add.text(player_ship.x, player_ship.y, missileMessage,
+        this.missileText = this.add.text(player_ship.x, player_ship.y + 25, missileMessage,
             { font: '10px Orbitron', fill: 'white' }
         );
         this.missileText.anchor.setTo(0.5, 0.5);
+
+        this.game.time.events.add(500, function () {
+            this.game.add.tween(this.missileText).to({ alpha: 0 }, 1500, Phaser.Easing.Linear.None, true);
+        }, this);
     },
 
     gainFireball: function (player_ship, fireballPowerUp) {
@@ -589,10 +594,14 @@ BasicGame.Game.prototype = {
         }
 
         var fireballMessage = "Fireball";
-        this.fireballText = this.add.text(player_ship.x, player_ship.y, fireballMessage,
+        this.fireballText = this.add.text(player_ship.x, player_ship.y + 25, fireballMessage,
             { font: '10px Orbitron', fill: 'white' }
         );
         this.fireballText.anchor.setTo(0.5, 0.5);
+
+        this.game.time.events.add(500, function () {
+            this.game.add.tween(this.fireballText).to({ alpha: 0 }, 1500, Phaser.Easing.Linear.None, true);
+        }, this);
     },
 
     displayEnd: function (win) {
