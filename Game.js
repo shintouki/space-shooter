@@ -33,6 +33,7 @@ BasicGame.Game.prototype = {
 
         // Load player weapons
         this.load.image('bullet', 'assets/bullet.png');
+        this.load.image('laser', 'assets/laser.png');
         this.load.image('missile', 'assets/missile.png');
         this.load.image('missileMirror', 'assets/missile_mirror.png');
         this.load.image('fireball', 'assets/fireball.png');
@@ -49,6 +50,7 @@ BasicGame.Game.prototype = {
 
         // Load power ups
         this.load.image('bulletPowerUp', 'assets/powerup.png');
+        this.load.image('laserPowerUp', 'assets/laserPowerup.png');
         this.load.image('missilePowerUp', 'assets/missilePower.png');
         this.load.image('fireballPowerUp', 'assets/fireball_powerup.png');
 
@@ -65,9 +67,11 @@ BasicGame.Game.prototype = {
         this.setupPlayerShip();
         this.setupEnemies();
         this.setupBullets();
+        this.setupLasers();
         
         this.setupExplosions();
         this.setupLifeIcons();
+        this.setupLaserPowerUps();
         this.setupMissilePowerUps();
         this.setupFireballPowerUps();
         this.setupRanks();
@@ -80,6 +84,8 @@ BasicGame.Game.prototype = {
         // Player ships's weapon hits enemy
         this.physics.arcade.overlap(this.bulletPool, this.basicEnemyPool, this.enemyHitByBullet, null, this);
         this.physics.arcade.overlap(this.bulletPool, this.scaryEnemyPool, this.enemyHitByBullet, null, this);
+        this.physics.arcade.overlap(this.laserPool, this.basicEnemyPool, this.enemyHitByLaser, null, this);
+        this.physics.arcade.overlap(this.laserPool, this.scaryEnemyPool, this.enemyHitByLaser, null, this);
         this.physics.arcade.overlap(this.missilePool, this.basicEnemyPool, this.enemyHitByMissile, null, this);
         this.physics.arcade.overlap(this.missilePool, this.scaryEnemyPool, this.enemyHitByMissile, null, this);
         this.physics.arcade.overlap(this.missileMirrorPool, this.basicEnemyPool, this.enemyHitByMissile, null, this);
@@ -95,6 +101,7 @@ BasicGame.Game.prototype = {
         this.physics.arcade.overlap(this.player_ship, this.enemyBulletPool, this.playerHit, null, this);
 
         // Pick up power up
+        this.physics.arcade.overlap(this.player_ship, this.laserPowerUpPool, this.gainLaser, null, this);
         this.physics.arcade.overlap(this.player_ship, this.missilePowerUpPool, this.gainMissile, null, this);
         this.physics.arcade.overlap(this.player_ship, this.fireballPowerUpPool, this.gainFireball, null, this);
     },
@@ -139,7 +146,11 @@ BasicGame.Game.prototype = {
             if (this.restartText && this.restartText.exists) {
                 this.quitGame();
             } else {
-                this.fireBullet();
+                if (this.laserActivated) {
+                    this.fireLaser();
+                } else {
+                    this.fireBullet();
+                }
                 if (this.missileActivated) {
                     this.fireMissile();
                 }
@@ -197,6 +208,8 @@ BasicGame.Game.prototype = {
     },
 
     render: function () {
+        // Debug mode to see hitboxes
+
         // this.game.debug.body(this.player_ship);
         
         // this.debugGroup(this.basicEnemyPool);
@@ -228,6 +241,7 @@ BasicGame.Game.prototype = {
         this.player_ship.speed = 250;
         this.player_ship.body.collideWorldBounds = true;
         this.player_ship.body.setSize(10, 10, 0, -5);
+        this.laserActivated = false;
         this.missileActivated = false;
         this.fireballActivated = false;
     },
@@ -242,6 +256,7 @@ BasicGame.Game.prototype = {
         this.basicEnemyPool.setAll('outOfBoundsKill', true);
         this.basicEnemyPool.setAll('checkWorldBounds', true);
         this.basicEnemyPool.setAll('reward', BasicGame.BASIC_ENEMY_REWARD, false, false, 0, true);
+        this.basicEnemyPool.setAll('laserDropRate', BasicGame.BASIC_ENEMY_LASER_DROP_RATE, false, false, 0, true);
         this.basicEnemyPool.setAll('missileDropRate', BasicGame.BASIC_ENEMY_MISSILE_DROP_RATE, false, false, 0, true);
         this.basicEnemyPool.setAll('fireballDropRate', BasicGame.BASIC_ENEMY_FIREBALL_DROP_RATE, false, false, 0, true);
 
@@ -258,6 +273,7 @@ BasicGame.Game.prototype = {
         this.scaryEnemyPool.setAll('outOfBoundsKill', true);
         this.scaryEnemyPool.setAll('checkWorldBounds', true);
         this.scaryEnemyPool.setAll('reward', BasicGame.SCARY_ENEMY_REWARD, false, false, 0, true);
+        this.scaryEnemyPool.setAll('laserDropRate', BasicGame.SCARY_ENEMY_LASER_DROP_RATE, false, false, 0, true);
         this.scaryEnemyPool.setAll('missileDropRate', BasicGame.SCARY_ENEMY_MISSILE_DROP_RATE, false, false, 0, true);
         this.scaryEnemyPool.setAll('fireballDropRate', BasicGame.SCARY_ENEMY_FIREBALL_DROP_RATE, false, false, 0, true);
         
@@ -271,7 +287,7 @@ BasicGame.Game.prototype = {
         this.enemyBulletPool = this.add.group();
         this.enemyBulletPool.enableBody = true;
         this.enemyBulletPool.physicsBodyType = Phaser.Physics.ARCADE;
-        this.enemyBulletPool.createMultiple(100, 'enemyBullet');
+        this.enemyBulletPool.createMultiple(200, 'enemyBullet');
         this.enemyBulletPool.setAll('anchor.x', 0.5);
         this.enemyBulletPool.setAll('anchor.y', 0.5);
         this.enemyBulletPool.setAll('outOfBoundsKill', true);
@@ -289,6 +305,20 @@ BasicGame.Game.prototype = {
 
         this.nextShotAt = 0;
         this.shotDelay = BasicGame.BULLET_DELAY;
+    },
+
+    setupLasers: function () {
+        this.laserPool = this.add.group();
+        this.laserPool.enableBody = true;
+        this.laserPool.physicsBodyType = Phaser.Physics.ARCADE;
+        this.laserPool.createMultiple(100, 'laser');
+        this.laserPool.setAll('anchor.x', 0.5);
+        this.laserPool.setAll('anchor.y', 0.5);
+        this.laserPool.setAll('outOfBoundsKill', true);
+        this.laserPool.setAll('checkWorldBounds', true);
+
+        this.nextLaserShotAt = 0;
+        this.LaserShotDelay = BasicGame.LASER_DELAY;
     },
 
     setupMissiles: function () {
@@ -348,6 +378,18 @@ BasicGame.Game.prototype = {
             life.scale.setTo(0.5, 0.5);
             life.anchor.setTo(0.5, 0.5);
         }
+    },
+
+    setupLaserPowerUps: function () {
+        this.laserPowerUpPool = this.add.group();
+        this.laserPowerUpPool.enableBody = true;
+        this.laserPowerUpPool.physicsBodyType = Phaser.Physics.ARCADE;
+        this.laserPowerUpPool.createMultiple(5, 'laserPowerUp');
+        this.laserPowerUpPool.setAll('anchor.x', 0.5);
+        this.laserPowerUpPool.setAll('anchor.y', 0.5);
+        this.laserPowerUpPool.setAll('outOfBoundsKill', true);
+        this.laserPowerUpPool.setAll('checkWorldBounds', true);
+        this.laserPowerUpPool.setAll('reward', BasicGame.POWER_UP_REWARD, false, false, 0, true);
     },
 
     setupMissilePowerUps: function () {
@@ -413,6 +455,7 @@ BasicGame.Game.prototype = {
         var life = this.lives.getFirstAlive();
         if (life !== null) {
             life.kill();
+            this.laserActivated = false;
             this.missileActivated = false;
             this.fireballActivated = false;
             this.invulUntil = this.time.now + BasicGame.INVULNERABLE_TIME;
@@ -426,6 +469,10 @@ BasicGame.Game.prototype = {
     enemyHitByBullet: function (bullet, enemy_ship) {
         bullet.kill();
         this.damageEnemy(enemy_ship, BasicGame.BASIC_BULLET_DAMAGE);
+    },
+
+    enemyHitByLaser: function (laser, enemy_ship) {
+        this.damageEnemy(enemy_ship, BasicGame.LASER_DAMAGE);
     },
 
     enemyHitByMissile: function (missile, enemy_ship) {
@@ -467,6 +514,18 @@ BasicGame.Game.prototype = {
         var bullet = this.bulletPool.getFirstExists(false);
         bullet.reset(this.player_ship.x, this.player_ship.y - 20);
         bullet.body.velocity.y = -500;
+    },
+
+    fireLaser: function () {
+        if (!this.player_ship.alive || this.nextLaserShotAt > this.time.now) {
+            return;
+        }
+
+        this.nextLaserShotAt = this.time.now + this.LaserShotDelay;
+
+        var laser = this.laserPool.getFirstExists(false);
+        laser.reset(this.player_ship.x, this.player_ship.y - 20);
+        laser.body.velocity.y = -500;
     },
 
     fireMissile: function () {
@@ -551,6 +610,14 @@ BasicGame.Game.prototype = {
             return;
         }
 
+        // Laser power up
+        if (this.rnd.frac() < enemy_ship.laserDropRate && this.laserPowerUpPool.countDead() > 0) {
+            var laserPowerUp = this.laserPowerUpPool.getFirstExists(false);
+            laserPowerUp.scale.set(0.75, 0.75);
+            laserPowerUp.reset(enemy_ship.x, enemy_ship.y);
+            laserPowerUp.body.velocity.y = 75;
+        }
+
         // Missile power up
         if (this.rnd.frac() < enemy_ship.missileDropRate && this.missilePowerUpPool.countDead() > 0) {
             var missilePowerUp = this.missilePowerUpPool.getFirstExists(false);
@@ -568,6 +635,25 @@ BasicGame.Game.prototype = {
         }
     },
 
+    gainLaser: function (player_ship, laserPowerUp) {
+        this.addToScore(laserPowerUp.reward);
+        laserPowerUp.kill();
+        if (!this.laserActivated) {
+            this.laserActivated = true;
+        }
+
+        var laserMessage = "Laser";
+        this.laserText = this.add.text(player_ship.x, player_ship.y + 25, laserMessage,
+            { font: '10px Orbitron', fill: 'white' }
+        );
+        this.laserText.anchor.setTo(0.5, 0.5);
+
+        // Wait 0.5s, then fade out in 1.5s
+        this.game.time.events.add(500, function () {
+            this.game.add.tween(this.laserText).to({ alpha: 0 }, 1500, Phaser.Easing.Linear.None, true);
+        }, this);
+    },
+
     gainMissile: function (player_ship, missilePowerUp) {
         this.addToScore(missilePowerUp.reward);
         missilePowerUp.kill();
@@ -581,6 +667,7 @@ BasicGame.Game.prototype = {
         );
         this.missileText.anchor.setTo(0.5, 0.5);
 
+        // Wait 0.5s, then fade out in 1.5s
         this.game.time.events.add(500, function () {
             this.game.add.tween(this.missileText).to({ alpha: 0 }, 1500, Phaser.Easing.Linear.None, true);
         }, this);
@@ -599,6 +686,7 @@ BasicGame.Game.prototype = {
         );
         this.fireballText.anchor.setTo(0.5, 0.5);
 
+        // Wait 0.5s, then fade out in 1.5s
         this.game.time.events.add(500, function () {
             this.game.add.tween(this.fireballText).to({ alpha: 0 }, 1500, Phaser.Easing.Linear.None, true);
         }, this);
