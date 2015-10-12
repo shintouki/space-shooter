@@ -264,7 +264,7 @@ BasicGame.Game.prototype = {
         this.basicEnemyPool = this.add.group();
         this.basicEnemyPool.enableBody = true;
         this.basicEnemyPool.physicsBodyType = Phaser.Physics.ARCADE;
-        this.basicEnemyPool.createMultiple(50, 'enemy_ship_1');
+        this.basicEnemyPool.createMultiple(500, 'enemy_ship_1');
         this.basicEnemyPool.setAll('anchor.x', 0.5);
         this.basicEnemyPool.setAll('anchor.y', 0.5);
         this.basicEnemyPool.setAll('outOfBoundsKill', true);
@@ -281,7 +281,7 @@ BasicGame.Game.prototype = {
         this.scaryEnemyPool = this.add.group();
         this.scaryEnemyPool.enableBody = true;
         this.scaryEnemyPool.physicsBodyType = Phaser.Physics.ARCADE;
-        this.scaryEnemyPool.createMultiple(50, 'enemy_ship_2');
+        this.scaryEnemyPool.createMultiple(500, 'enemy_ship_2');
         this.scaryEnemyPool.setAll('anchor.x', 0.5);
         this.scaryEnemyPool.setAll('anchor.y', 0.5);
         this.scaryEnemyPool.setAll('outOfBoundsKill', true);
@@ -301,7 +301,7 @@ BasicGame.Game.prototype = {
         this.enemyBulletPool = this.add.group();
         this.enemyBulletPool.enableBody = true;
         this.enemyBulletPool.physicsBodyType = Phaser.Physics.ARCADE;
-        this.enemyBulletPool.createMultiple(200, 'enemyBullet');
+        this.enemyBulletPool.createMultiple(800, 'enemyBullet');
         this.enemyBulletPool.setAll('anchor.x', 0.5);
         this.enemyBulletPool.setAll('anchor.y', 0.5);
         this.enemyBulletPool.setAll('outOfBoundsKill', true);
@@ -445,7 +445,7 @@ BasicGame.Game.prototype = {
 
         // Stage 1 text
         this.stage1 = this.add.text(this.game.width / 2, this.game.height / 2,
-            'Stage 1',
+            'Stage Moni',
             { font: '40px Orbitron', fill: 'white', align: 'center' }
         );
         this.stage1.anchor.setTo(0.5, 0.5);
@@ -578,11 +578,7 @@ BasicGame.Game.prototype = {
         this.fireball.scale.set(2.25, 3);
         this.fireball.angle = 90;
         this.fireball.reset(this.player_ship.x, this.player_ship.y - 50);
-        // this.updateFireballPosition(fireball);
-        // fireball.body.velocity.y = -100;
-        // fireball.body.velocity.y = -10;
         this.fireball.body.setSize(60, 50, -5, -20);
-        // this.player_ship.body.setSize(10, 10, 0, -5);
 
         this.fireballExpire = this.time.now + 1000;
         // this.game.time.events.add(1000, function() {
@@ -614,7 +610,7 @@ BasicGame.Game.prototype = {
     addToScore: function (score) {
         this.score += score;
         this.scoreText.text = this.score;
-        if (this.score >= 100000) {
+        if (this.score >= 500000) {
             this.basicEnemyPool.destroy();
             this.scaryEnemyPool.destroy();
             this.enemyBulletPool.destroy();
@@ -725,17 +721,15 @@ BasicGame.Game.prototype = {
 
     quitGame: function (pointer) {
 
-        //  Here you should destroy anything you no longer need.
-        //  Stop music, delete sprites, purge caches, free resources, all that good stuff.
-
-        //  Then let's go back to the main menu.
         this.starfield.destroy();
         // this.player_ship.destroy();
         this.basicEnemyPool.destroy();
         this.bulletPool.destroy();
+        this.laserPool.destroy();
         this.missilePool.destroy();
         this.fireballPool.destroy();
         this.explosionPool.destroy();
+        this.laserPowerUpPool.destory();
         this.missilePowerUpPool.destroy();
         this.fireballPowerUpPool.destroy();
         this.instructions.destroy();
