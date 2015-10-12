@@ -7,7 +7,7 @@ var BasicGame = {
 
     // Player weapon shot delay
     BULLET_DELAY: Phaser.Timer.SECOND * 0.2,
-    MISSILE_DELAY: Phaser.Timer.SECOND * 0.5,
+    MISSILE_DELAY: Phaser.Timer.SECOND * 0.75,
     FIREBALL_DELAY: Phaser.Timer.SECOND * 2,
 
     // Enemy shot delay
@@ -15,7 +15,7 @@ var BasicGame = {
     SCARY_ENEMY_SHOT_DELAY: Phaser.Timer.SECOND * 2,
 
     // Enemy health
-    BASIC_ENEMY_HEALTH: 2,
+    BASIC_ENEMY_HEALTH: 3,
     SCARY_ENEMY_HEALTH: 5,
 
     ENEMY_BULLET_VELOCITY: 150,
@@ -36,11 +36,15 @@ var BasicGame = {
     POWER_UP_REWARD: 1000,
 
     // Power up drop rate
-    BASIC_ENEMY_MISSILE_DROP_RATE: 0.2,
-    SCARY_ENEMY_MISSILE_DROP_RATE: 0.4,
-    BASIC_ENEMY_FIREBALL_DROP_RATE: 0.2,
-    SCARY_ENEMY_FIREBALL_DROP_RATE: 0.4,
+    // BASIC_ENEMY_MISSILE_DROP_RATE: 0.1,
+    // SCARY_ENEMY_MISSILE_DROP_RATE: 0.2,
+    // BASIC_ENEMY_FIREBALL_DROP_RATE: 0.05,
+    // SCARY_ENEMY_FIREBALL_DROP_RATE: 0.1,
 
+    BASIC_ENEMY_MISSILE_DROP_RATE: 0.5,
+    SCARY_ENEMY_MISSILE_DROP_RATE: 0.5,
+    BASIC_ENEMY_FIREBALL_DROP_RATE: 0.5,
+    SCARY_ENEMY_FIREBALL_DROP_RATE: 0.5,
 
     // Lives
     EXTRA_LIVES: 3,

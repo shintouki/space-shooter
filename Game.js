@@ -25,22 +25,9 @@ BasicGame.Game = function (game) {
 
 };
 
-// WebFontConfig = {
-//         active: function () { this.game.time.events.add(Phaser.Timer.SECOND, createText, this); },
-//         google: {
-//             families: ['Orbitron']
-//         }
-
-// };
-
 BasicGame.Game.prototype = {
 
-    
-
     preload: function () {
-
-        // this.game.load.script('webfont', '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
-
         // Load background
         this.load.image('starfield', 'assets/starfield.png');
 
@@ -73,14 +60,16 @@ BasicGame.Game.prototype = {
     create: function () {
         this.setupBackground();
         this.setupPlayerShip();
-        this.setupEnemies();
-        this.setupBullets();
         this.setupMissiles();
         this.setupFireballs();
+        this.setupEnemies();
+        this.setupBullets();
+        
         this.setupExplosions();
         this.setupLifeIcons();
         this.setupMissilePowerUps();
         this.setupFireballPowerUps();
+        this.setupRanks();
         this.setupText();
 
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -207,9 +196,23 @@ BasicGame.Game.prototype = {
     },
 
     render: function () {
-        this.game.debug.body(this.player_ship);
-        // this.game.debug.body(this.basicEnemyPool);
-        // this.game.debug.body(this.bulletPool);
+        // this.game.debug.body(this.player_ship);
+        
+        // this.debugGroup(this.basicEnemyPool);
+        // this.debugGroup(this.scaryEnemyPool);
+        // this.debugGroup(this.bulletPool);
+        // this.debugGroup(this.missilePool);
+        // this.debugGroup(this.missileMirrorPool);
+        // // this.debugGroup(this.fireballPool)
+        // this.debugGroup(this.enemyBulletPool);
+        // this.debugGroup(this.missilePowerUpPool);
+        // this.debugGroup(this.fireballPowerUpPool);
+    },
+
+    debugGroup: function (group) {
+        group.forEachAlive(function (object) {
+            this.game.debug.body(object);
+        }, this);
     },
 
     setupBackground: function () {
@@ -225,6 +228,7 @@ BasicGame.Game.prototype = {
         this.player_ship.body.collideWorldBounds = true;
         this.player_ship.body.setSize(10, 10, 0, -5);
         this.missileActivated = false;
+        this.fireballActivated = false;
     },
 
     setupEnemies: function() {
@@ -254,7 +258,7 @@ BasicGame.Game.prototype = {
         this.scaryEnemyPool.setAll('checkWorldBounds', true);
         this.scaryEnemyPool.setAll('reward', BasicGame.SCARY_ENEMY_REWARD, false, false, 0, true);
         this.scaryEnemyPool.setAll('missileDropRate', BasicGame.SCARY_ENEMY_MISSILE_DROP_RATE, false, false, 0, true);
-        this.basicEnemyPool.setAll('fireballDropRate', BasicGame.SCARY_ENEMY_FIREBALL_DROP_RATE, false, false, 0, true);
+        this.scaryEnemyPool.setAll('fireballDropRate', BasicGame.SCARY_ENEMY_FIREBALL_DROP_RATE, false, false, 0, true);
         
         this.nextScaryEnemyAt = this.time.now + Phaser.Timer.SECOND * 5;
         this.nextScaryEnemyDelay = BasicGame.SPAWN_SCARY_DELAY;
@@ -369,6 +373,10 @@ BasicGame.Game.prototype = {
         this.fireballPowerUpPool.setAll('reward', BasicGame.POWER_UP_REWARD, false, false, 0, true);
     },
 
+    setupRanks: function () {
+
+    },
+
     setupText: function() {
         // How to play instructions at beginning
         this.instructions = this.add.text(this.game.width / 2, this.game.height - 100,
@@ -470,6 +478,7 @@ BasicGame.Game.prototype = {
         var missileLeft = this.missilePool.getFirstExists(false);
         missileLeft.scale.set(0.75, 0.75);
         missileLeft.angle = -90;
+        missileLeft.body.setSize(12, 40, 0,0);
 
         missileLeft.reset(this.player_ship.x + 15, this.player_ship.y - 10);
         missileLeft.body.velocity.y = -250;
@@ -477,6 +486,7 @@ BasicGame.Game.prototype = {
         var missileRight = this.missileMirrorPool.getFirstExists(false);
         missileRight.scale.set(0.75, 0.75);
         missileRight.angle = -90;
+        missileRight.body.setSize(12, 40, 0,0);
 
         missileRight.reset(this.player_ship.x - 15, this.player_ship.y - 10);
         missileRight.body.velocity.y = -250;
@@ -493,9 +503,12 @@ BasicGame.Game.prototype = {
         var fireball = this.fireballPool.getFirstExists(false);
         fireball.scale.set(2.25, 3);
         fireball.angle = 90;
-
         fireball.reset(this.player_ship.x, this.player_ship.y - 50);
-        fireball.body.velocity.y = -100;
+        // fireball.body.velocity.y = -100;
+        fireball.body.velocity.y = -10;
+        fireball.body.setSize(60, 50, -5, -20);
+        // this.player_ship.body.setSize(10, 10, 0, -5);
+
         this.game.time.events.add(1000, function() {
             fireball.kill();
         }, this);
@@ -560,6 +573,12 @@ BasicGame.Game.prototype = {
         if (!this.missileActivated) {
             this.missileActivated = true;
         }
+
+        var missileMessage = "Missile";
+        this.missileText = this.add.text(player_ship.x, player_ship.y, missileMessage,
+            { font: '10px Orbitron', fill: 'white' }
+        );
+        this.missileText.anchor.setTo(0.5, 0.5);
     },
 
     gainFireball: function (player_ship, fireballPowerUp) {
@@ -568,6 +587,12 @@ BasicGame.Game.prototype = {
         if (!this.fireballActivated) {
             this.fireballActivated = true;
         }
+
+        var fireballMessage = "Fireball";
+        this.fireballText = this.add.text(player_ship.x, player_ship.y, fireballMessage,
+            { font: '10px Orbitron', fill: 'white' }
+        );
+        this.fireballText.anchor.setTo(0.5, 0.5);
     },
 
     displayEnd: function (win) {
@@ -575,8 +600,8 @@ BasicGame.Game.prototype = {
             return;
         }
         
-        var msg = win ? 'You win!' : 'Game Over!';
-        this.endText = this.add.text(this.game.width / 2, this.game.height / 2 - 60, msg,
+        var endMessage = win ? 'You win!' : 'Game Over!';
+        this.endText = this.add.text(this.game.width / 2, this.game.height / 2 - 60, endMessage,
             { font: '60px Orbitron', fill: 'white' }
         );
         this.endText.anchor.setTo(0.5, 0);
