@@ -254,6 +254,7 @@ BasicGame.Game.prototype = {
         this.player_ship.speed = 250;
         this.player_ship.body.collideWorldBounds = true;
         this.player_ship.body.setSize(10, 10, 0, -5);
+
         this.laserActivated = false;
         this.missileActivated = false;
         this.fireballActivated = false;
@@ -295,13 +296,11 @@ BasicGame.Game.prototype = {
         this.nextScaryEnemyDelay = BasicGame.SPAWN_SCARY_DELAY;
     },
 
-
-
     setupBullets: function() {
         this.enemyBulletPool = this.add.group();
         this.enemyBulletPool.enableBody = true;
         this.enemyBulletPool.physicsBodyType = Phaser.Physics.ARCADE;
-        this.enemyBulletPool.createMultiple(800, 'enemyBullet');
+        this.enemyBulletPool.createMultiple(1000, 'enemyBullet');
         this.enemyBulletPool.setAll('anchor.x', 0.5);
         this.enemyBulletPool.setAll('anchor.y', 0.5);
         this.enemyBulletPool.setAll('outOfBoundsKill', true);
@@ -445,7 +444,7 @@ BasicGame.Game.prototype = {
 
         // Stage 1 text
         this.stage1 = this.add.text(this.game.width / 2, this.game.height / 2,
-            'Stage Moni',
+            'Stage 1',
             { font: '40px Orbitron', fill: 'white', align: 'center' }
         );
         this.stage1.anchor.setTo(0.5, 0.5);
@@ -519,7 +518,7 @@ BasicGame.Game.prototype = {
     },
 
     fireBullet: function () {
-        if (!this.player_ship.alive || this.nextShotAt > this.time.now) {
+        if (!this.player_ship.alive || this.nextShotAt > this.time.now || this.bulletPool.countDead() <= 0) {
             return;
         }
 
@@ -531,7 +530,7 @@ BasicGame.Game.prototype = {
     },
 
     fireLaser: function () {
-        if (!this.player_ship.alive || this.nextLaserShotAt > this.time.now) {
+        if (!this.player_ship.alive || this.nextLaserShotAt > this.time.now || this.laserPool.countDead() <= 0) {
             return;
         }
 
@@ -543,7 +542,7 @@ BasicGame.Game.prototype = {
     },
 
     fireMissile: function () {
-        if (!this.player_ship.alive || this.nextMissileShotAt > this.time.now) {
+        if (!this.player_ship.alive || this.nextMissileShotAt > this.time.now || this.missilePool.countDead() <= 0) {
             return;
         }
 
@@ -567,7 +566,7 @@ BasicGame.Game.prototype = {
     },
 
     fireFireball: function () {
-        if (!this.player_ship.alive || this.nextFireballShotAt > this.time.now) {
+        if (!this.player_ship.alive || this.nextFireballShotAt > this.time.now || this.fireballPool.countDead() <= 0) {
             return;
         }
 
@@ -610,7 +609,7 @@ BasicGame.Game.prototype = {
     addToScore: function (score) {
         this.score += score;
         this.scoreText.text = this.score;
-        if (this.score >= 500000) {
+        if (this.score >= 100000) {
             this.basicEnemyPool.destroy();
             this.scaryEnemyPool.destroy();
             this.bulletPool.destroy();
