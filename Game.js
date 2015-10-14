@@ -54,6 +54,12 @@ BasicGame.Game.prototype = {
         this.load.image('missilePowerUp', 'assets/missilePower.png');
         this.load.image('fireballPowerUp', 'assets/fireball_powerup.png');
 
+        // Load health icons
+        this.load.image('health0', 'assets/health0.png');
+        this.load.image('health1', 'assets/health2.png');
+        this.load.image('health2', 'assets/health4.png');
+        this.load.image('health3', 'assets/health6.png');
+
         // Load explosions
         this.load.spritesheet('explosion1', 'assets/explosion.png', 32, 32);
 
@@ -70,7 +76,7 @@ BasicGame.Game.prototype = {
         this.setupLasers();
         
         this.setupExplosions();
-        this.setupLifeIcons();
+        this.setupHealthIcons();
         this.setupLaserPowerUps();
         this.setupMissilePowerUps();
         this.setupFireballPowerUps();
@@ -107,14 +113,17 @@ BasicGame.Game.prototype = {
     },
 
     spawnEnemies: function () {
+        // Spawn basic enemy
         if (this.nextEnemyAt < this.time.now && this.basicEnemyPool.countDead() > 0) {
             this.nextEnemyAt = this.time.now + this.enemyDelay;
             var basicEnemy = this.basicEnemyPool.getFirstExists(false);
             basicEnemy.reset(this.rnd.integerInRange(20, this.game.width - 20), 0, BasicGame.BASIC_ENEMY_HEALTH);
             basicEnemy.body.velocity.y = this.rnd.integerInRange(30, 60);
             basicEnemy.nextShotAt = 0;
+            
         } 
 
+        // Spawn scary enemy
         if (this.nextScaryEnemyAt < this.time.now && this.scaryEnemyPool.countDead() > 0) {
             this.nextScaryEnemyAt = this.time.now + this.nextScaryEnemyDelay;
             var scaryEnemy = this.scaryEnemyPool.getFirstExists(false);
@@ -259,6 +268,7 @@ BasicGame.Game.prototype = {
         this.missileActivated = false;
         this.fireballActivated = false;
         this.fireballOn = false;
+
     },
 
     setupEnemies: function() {
@@ -383,14 +393,10 @@ BasicGame.Game.prototype = {
         });
     },
 
-    setupLifeIcons: function () {
-        this.lives = this.add.group();
-        var firstLifeIconX = this.game.width - 10 - (BasicGame.EXTRA_LIVES * 30);
-        for (var i = 0; i < BasicGame.EXTRA_LIVES; i++) {
-            var life = this.lives.create(firstLifeIconX + (30 * i), 30, 'player_ship');
-            life.scale.setTo(0.5, 0.5);
-            life.anchor.setTo(0.5, 0.5);
-        }
+    setupHealthIcons: function () {
+        this.healthIcon = this.add.sprite(this.game.width - 45, 25, 'health3');
+        this.healthIcon.anchor.setTo(0.5, 0.5);
+        this.currentHealth = 3;
     },
 
     setupLaserPowerUps: function () {
@@ -452,30 +458,48 @@ BasicGame.Game.prototype = {
 
         // Score counter
         this.score = 0;
-        this.scoreText = this.add.text(this.game.width / 2, 25, ' ' + this.score,
-            { font: '20px Orbitron', fill: 'white', align: 'center' }
+        this.scoreText = this.add.text(30, 25, ' ' + this.score,
+            { font: '20px Orbitron', fill: 'white', boundsAlignH: 'right' } // use settextbounds
         );
         this.scoreText.anchor.setTo(0.5, 0.5);
+        // this.scoreText.textAlign="left";
+
+        // this.fireballText = "Fireball"
     },
 
     playerHit: function (player_ship, enemy_ship) {
         if (this.invulUntil && this.invulUntil > this.time.now) {
             return;
         }
+
         this.damageEnemy(enemy_ship, BasicGame.CRASH_DAMAGE);
-        // this.explode(player_ship);
-        // player_ship.kill();
-        var life = this.lives.getFirstAlive();
-        if (life !== null) {
-            life.kill();
+        this.currentHealth--;
+
+        if (this.currentHealth === 2) {
+            this.healthIcon.destroy();
+            this.healthIcon = this.add.sprite(this.game.width - 45, 25, 'health2');
+            this.healthIcon.anchor.setTo(0.5, 0.5);
+        }
+        else if (this.currentHealth === 1) {
+            this.healthIcon.destroy();
+            this.healthIcon = this.add.sprite(this.game.width - 45, 25, 'health1');
+            this.healthIcon.anchor.setTo(0.5, 0.5);
+        }
+        
+        if (this.currentHealth === 0) {
+            this.healthIcon.destroy();
+            this.healthIcon = this.add.sprite(this.game.width - 45, 25, 'health0');
+            this.healthIcon.anchor.setTo(0.5, 0.5);
+
+            this.explode(player_ship);
+            player_ship.kill();
+            this.displayEnd(false);
+        }
+        else {
             this.laserActivated = false;
             this.missileActivated = false;
             this.fireballActivated = false;
             this.invulUntil = this.time.now + BasicGame.INVULNERABLE_TIME;
-        } else {
-            this.explode(player_ship);
-            player_ship.kill();
-            this.displayEnd(false);
         }
     },
 
@@ -486,6 +510,7 @@ BasicGame.Game.prototype = {
 
     enemyHitByLaser: function (laser, enemy_ship) {
         this.damageEnemy(enemy_ship, BasicGame.LASER_DAMAGE);
+        // laser.exists = false;
     },
 
     enemyHitByMissile: function (missile, enemy_ship) {
@@ -494,11 +519,11 @@ BasicGame.Game.prototype = {
     },
 
     enemyHitByFireball: function (fireball, enemy_ship) {
-        // fireball.kill();
         this.damageEnemy(enemy_ship, BasicGame.FIREBALL_DAMAGE);
     },
 
     damageEnemy: function (enemy_ship, damage) {
+
         enemy_ship.damage(damage);
         if (!enemy_ship.alive) {
             this.explode(enemy_ship);
@@ -609,7 +634,8 @@ BasicGame.Game.prototype = {
     addToScore: function (score) {
         this.score += score;
         this.scoreText.text = this.score;
-        if (this.score >= 100000) {
+        // Win condition
+        if (this.score >= 500000) {
             this.basicEnemyPool.destroy();
             this.scaryEnemyPool.destroy();
             this.bulletPool.destroy();
@@ -705,10 +731,19 @@ BasicGame.Game.prototype = {
         );
         this.fireballText.anchor.setTo(0.5, 0.5);
 
-        // Wait 0.5s, then fade out in 1.5s
-        this.game.time.events.add(500, function () {
-            this.game.add.tween(this.fireballText).to({ alpha: 0 }, 1500, Phaser.Easing.Linear.None, true);
-        }, this);
+        // Fade out in 1.5s
+        var fadeText = this.game.add.tween(this.fireballText).to({ alpha: 0 }, 1500, Phaser.Easing.Linear.None, true);
+
+        // Destroy fireball text when it is done fading
+        // fadeText.onComplete.add(function() {
+        //     this.fireballText.destroy();
+        // }, this);
+        
+
+        // this.game.time.events.add(1000, function() {
+        //     this.fireballText.destroy();
+        // }, this);
+        
     },
 
     displayEnd: function (win) {
@@ -733,7 +768,9 @@ BasicGame.Game.prototype = {
         this.bulletPool.destroy();
         this.laserPool.destroy();
         this.missilePool.destroy();
-        this.fireballPool.destroy();
+        // if (this.fireballText.exists) {
+        //     this.fireballPool.destroy();
+        // }   
         this.explosionPool.destroy();
         this.laserPowerUpPool.destroy();
         this.missilePowerUpPool.destroy();
@@ -742,6 +779,7 @@ BasicGame.Game.prototype = {
         this.scoreText.destroy();
         this.endText.destroy();
         this.restartText.destroy();
+        this.healthIcon.destroy();
 
         this.state.start('Game');
 
