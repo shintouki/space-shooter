@@ -469,7 +469,7 @@ BasicGame.Game.prototype = {
 
     playerHit: function (player_ship, enemy_ship) {
         if (this.invulUntil && this.invulUntil > this.time.now) {
-            return;
+            return; 
         }
 
         this.damageEnemy(enemy_ship, BasicGame.CRASH_DAMAGE);
