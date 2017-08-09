@@ -450,7 +450,7 @@ BasicGame.Game.prototype = {
 
         // Stage 1 text
         this.stage1 = this.add.text(this.game.width / 2, this.game.height / 2,
-            'Stage X',
+            'Hi Misha',
             { font: '40px Orbitron', fill: 'white', align: 'center' }
         );
         this.stage1.anchor.setTo(0.5, 0.5);
