@@ -275,7 +275,7 @@ BasicGame.Game.prototype = {
         this.basicEnemyPool = this.add.group();
         this.basicEnemyPool.enableBody = true;
         this.basicEnemyPool.physicsBodyType = Phaser.Physics.ARCADE;
-        this.basicEnemyPool.createMultiple(500, 'enemy_ship_1');
+        this.basicEnemyPool.createMultiple(10000, 'enemy_ship_1');
         this.basicEnemyPool.setAll('anchor.x', 0.5);
         this.basicEnemyPool.setAll('anchor.y', 0.5);
         this.basicEnemyPool.setAll('outOfBoundsKill', true);
@@ -292,7 +292,7 @@ BasicGame.Game.prototype = {
         this.scaryEnemyPool = this.add.group();
         this.scaryEnemyPool.enableBody = true;
         this.scaryEnemyPool.physicsBodyType = Phaser.Physics.ARCADE;
-        this.scaryEnemyPool.createMultiple(500, 'enemy_ship_2');
+        this.scaryEnemyPool.createMultiple(10000, 'enemy_ship_2');
         this.scaryEnemyPool.setAll('anchor.x', 0.5);
         this.scaryEnemyPool.setAll('anchor.y', 0.5);
         this.scaryEnemyPool.setAll('outOfBoundsKill', true);
@@ -450,7 +450,7 @@ BasicGame.Game.prototype = {
 
         // Stage 1 text
         this.stage1 = this.add.text(this.game.width / 2, this.game.height / 2,
-            'Stage 1',
+            'Stage X',
             { font: '40px Orbitron', fill: 'white', align: 'center' }
         );
         this.stage1.anchor.setTo(0.5, 0.5);
