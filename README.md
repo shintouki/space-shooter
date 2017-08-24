@@ -1,2 +1,2 @@
 # space-shooter
-https://tshin1.github.io/space-shooter
+https://tshin7.github.io/space-shooter
